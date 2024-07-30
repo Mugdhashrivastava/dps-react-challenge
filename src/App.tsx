@@ -12,6 +12,7 @@ const App: React.FC = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
+  const [highlightOldest, setHighlightOldest] = useState(false);
 
   useEffect(() => {
     fetch('https://dummyjson.com/users')
@@ -36,6 +37,14 @@ const App: React.FC = () => {
 
   const cities = Array.from(new Set(customers.map(customer => customer.city)));
 
+  const getOldestCustomerInCity = (city: string) => {
+    return customers
+      .filter(customer => customer.city === city)
+      .reduce((oldest, customer) => {
+        return new Date(customer.birthDate) < new Date(oldest.birthDate) ? customer : oldest;
+      }, customers[0]);
+  };
+
   return (
     <div>
       <h1>Customer List</h1>
@@ -53,12 +62,28 @@ const App: React.FC = () => {
           </option>
         ))}
       </select>
+      <label>
+        <input
+          type="checkbox"
+          checked={highlightOldest}
+          onChange={() => setHighlightOldest(!highlightOldest)}
+        />
+        Highlight oldest per city
+      </label>
       <ul>
-        {filteredCustomers.map(customer => (
-          <li key={customer.id}>
-            {customer.firstName} {customer.lastName} - {customer.city} - {new Date(customer.birthDate).toLocaleDateString()}
-          </li>
-        ))}
+        {filteredCustomers.map(customer => {
+          const isOldest = highlightOldest && getOldestCustomerInCity(customer.city).id === customer.id;
+          return (
+            <li
+              key={customer.id}
+              style={{
+                backgroundColor: isOldest ? 'lightblue' : 'transparent',
+              }}
+            >
+              {customer.firstName} {customer.lastName} - {customer.city} - {new Date(customer.birthDate).toLocaleDateString()}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
