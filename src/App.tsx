@@ -1,6 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import debounce from 'lodash.debounce';
 
+type Customer = {
+	id: number;
+	firstName: string;
+	lastName: string;
+	birthDate: string;
+	city: string;
+  };
+  
 const App: React.FC = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
