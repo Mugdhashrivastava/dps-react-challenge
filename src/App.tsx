@@ -10,6 +10,8 @@ interface Customer {
 
 const App: React.FC = () => {
 	const [customers, setCustomers] = useState<Customer[]>([]);
+	const [searchQuery, setSearchQuery] = useState('');
+	
 	useEffect(() => {
 		fetch('https://dummyjson.com/users')
 			.then((response) => response.json())
@@ -28,9 +30,21 @@ const App: React.FC = () => {
 			);
 	}, []);
 
+	const filteredCustomers = customers.filter((customer) =>
+		`${customer.firstName} ${customer.lastName}`
+			.toLowerCase()
+			.includes(searchQuery.toLowerCase())
+	);
+
 	return (
 		<div>
 			<h1>Customer List</h1>
+			<input
+				type="text"
+				placeholder="Search by name"
+				value={searchQuery}
+				onChange={(e) => setSearchQuery(e.target.value)}
+			/>
 			<ul>
 				{customers.map((customer) => (
 					<li key={customer.id}>
